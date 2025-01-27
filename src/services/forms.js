@@ -4,8 +4,7 @@ import enLocale from "i18n-iso-countries/langs/en.json";
 
 countries.registerLocale(enLocale);
 
-const apiKey = "db38e5ea332a763881abbd70921181f7"
-const forecastKey = "4732cb37c08e387a6d26391a88eb7e4b"
+const apiKey = import.meta.env.VITE_API_KEY;
 const weatherURL = "https://api.openweathermap.org/data/3.0/onecall?"
 const locURL = "https://api.openweathermap.org/geo/1.0/direct?"
 
