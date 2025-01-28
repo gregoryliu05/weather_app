@@ -1,10 +1,13 @@
 const express = require('express')
+const cors = require('cors')
 const weatherRoutes = require("./routes/weather");
-const cors = require('cors');
 
 const app = express();
-app.use(express.json());
+
+// Enable CORS for all routes
 app.use(cors());
+
+app.use(express.json());
 
 // Use weather routes
 app.use("/api", weatherRoutes);

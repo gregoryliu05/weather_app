@@ -3,6 +3,9 @@ import "./App.css";
 import weatherService from "./services/forms";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
+import WeatherHistory from './components/WeatherHistory';
+import Header from './components/Header';
+import dbService from "./services/dbService";
 
 function App() {
   const [selectedRange, setSelectedRange] = useState({ from: undefined, to: undefined });
@@ -22,41 +25,41 @@ function App() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const fetchWeatherData = async (city, countryCode) => {
+  const fetchWeatherData = async (city, country, selectedRange) => {
     try {
-      const coordsResponse = await weatherService.getCityCountryCoords(city, countryCode);
-      const { lat, lon } = coordsResponse.data[0];
-
-      // Fetch weather data for a range of dates
-      const weatherResponse = await weatherService.getCoordsWeather(lat, lon);
-      setResultData(weatherResponse.data);
-
-      setCurrLoc({ city, country: formData.country });
+      
+      const response = await dbService.createWeatherRequest(
+        city, 
+        country,
+        {
+          start: selectedRange.from.toISOString().split('T')[0],
+          end: selectedRange.to.toISOString().split('T')[0]
+        }
+      );
+      
+      setResultData(response.data.weather);
+      setCurrLoc({ city, country });
       setError(null);
+      
     } catch (err) {
-      setError("Invalid city name, or city is not in country. Please check your input.");
-      console.error("Error Fetching", err);
+      const errorMessage = err.response?.data?.error || 
+        "Invalid city name, or city is not in country. Please check your input.";
+      setError(errorMessage);
+      console.error("Error details:", {
+        message: err.response?.data?.error,
+        status: err.response?.status,
+        data: err.response?.data
+      });
     }
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
 
-    // Check if a valid date range is selected
-    if (!selectedRange || !selectedRange.from || !selectedRange.to) {
-      alert("Please select a valid date range.");
-      return;
-    }
-
-    const { city, country } = formData;
-    const countryCode = weatherService.getCountryCode(country);
-
-    if (!countryCode) {
-      setError("Invalid country name. Please check your input.");
-      return;
-    }
-
-    await fetchWeatherData(city, countryCode);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await fetchWeatherData(formData.city, formData.country, {
+      from: selectedRange?.from || new Date(),
+      to: selectedRange?.to || new Date()
+    });
   };
 
   const renderWeatherData = () => {
@@ -122,6 +125,7 @@ function App() {
 
   return (
     <div>
+      <Header />
       <form onSubmit={handleSubmit}>
         <label>
           City
@@ -163,6 +167,8 @@ function App() {
       </form>
       {error && <p style={{ color: "red" }}>{error}</p>}
       {renderWeatherData()}
+      
+      <WeatherHistory />
     </div>
   );
 }
