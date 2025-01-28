@@ -1,8 +1,32 @@
-# React + Vite
+**Weather App**
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+REQUIREMENTS:
+react, node.js
 
-Currently, two official plugins are available:
+npm install:
+axios
+dotenv
+i18n-iso-countries
+react-day-picker
+pg 
+express
+cors
+brew install postgresql
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+run: 
+cd app/src, then npm run dev
+cd app/backend, then npm start
+I'm using a local postgresql db, to run it, change the .env file to you user login, and then run this in your postgresql client:
+
+CREATE DATABASE your_database_name;
+
+\c your_database_name
+
+CREATE TABLE weather_requests (
+    id SERIAL PRIMARY KEY,
+    location VARCHAR(255) NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    weather_data JSONB NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
